@@ -17,75 +17,82 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import model.services.DepartmentService;
+import model.services.SellerService;
 
-public class MainViewController implements Initializable{
+public class MainViewController implements Initializable {
 
-	//Controle de tela
-	
+	// Controle de tela
+
 	@FXML
 	private MenuItem menuItemSeller;
-	
+
 	@FXML
 	private MenuItem menuItemDepartment;
-	
+
 	@FXML
 	private MenuItem menuItemAbout;
-	
-	
-	/*	Métodos para tratar os eventos do menu	*/
+
+	/* Métodos para tratar os eventos do menu */
 	@FXML
 	public void onMenuItemSellerAction() {
-		
-		System.out.println("onMenuItemSellerAction");
-	}
-	
-	@FXML
-	public void onMenuItemDepartmentAction() {
-		
-		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
-			
-			controller.setDepartmentService(new DepartmentService());
+
+		loadView("/gui/SellerList.fxml", (SellerListController controller) -> {
+
+			controller.setSellerService(new SellerService());
 			controller.updateTableView();
-		});		//2º parametro -> inicia o controlador
-	}
-	
-	@FXML
-	public void onMenuItemAboutAction() {
-		
-		loadView("/gui/About.fxml", x -> {});
-	}
-	
-	@Override
-	public void initialize(URL uri, ResourceBundle rb) {
-		
-		
+		});
 	}
 
-	
-	/*	Funçao para abrir outra tela	|| Funçao generica tipo <T>*/
-	private synchronized <T> void loadView(String absoluteName, Consumer<T> initializingAction) {	//synchronized -> impede interrupção durante multithreading
-		
+	@FXML
+	public void onMenuItemDepartmentAction() {
+
+		loadView("/gui/DepartmentList.fxml", (DepartmentListController controller) -> {
+
+			controller.setDepartmentService(new DepartmentService());
+			controller.updateTableView();
+		}); // 2º parametro -> inicia o controlador
+	}
+
+	@FXML
+	public void onMenuItemAboutAction() {
+
+		loadView("/gui/About.fxml", x -> {
+		});
+	}
+
+	@Override
+	public void initialize(URL uri, ResourceBundle rb) {
+
+	}
+
+	/* Funçao para abrir outra tela || Funçao generica tipo <T> */
+	private synchronized <T> void loadView(String absoluteName, Consumer<T> initializingAction) { // synchronized ->
+																									// impede
+																									// interrupção
+																									// durante
+																									// multithreading
+
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
 			VBox newVBox = loader.load();
-			
+
 			Scene mainScene = Main.getMainScene();
-			VBox mainVBox = (VBox) ((ScrollPane)mainScene.getRoot()).getContent();	//pega 1º elemento da view principal (ScrollPane)
-			
+			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent(); // pega 1º elemento da view
+																					// principal (ScrollPane)
+
 			Node mainMenu = mainVBox.getChildren().get(0);// 1º filho da vbox menu principal;
-			
-			mainVBox.getChildren().clear();		//Limpa todos os filhos do mainVBox
+
+			mainVBox.getChildren().clear(); // Limpa todos os filhos do mainVBox
 			mainVBox.getChildren().add(mainMenu);
 			mainVBox.getChildren().addAll(newVBox.getChildren());
-			
-			//Ativar a func initializingAction
-			T controller = loader.getController();	//Executam a açao que passar como parametro
-			initializingAction.accept(controller);	//Executam a açao que passar como parametro
-			
-		}catch(IOException e) {
+
+			// Ativar a func initializingAction
+			T controller = loader.getController(); // Executam a açao que passar como parametro
+			initializingAction.accept(controller); // Executam a açao que passar como parametro
+
+		} catch (IOException e) {
 			Alerts.showAlert("IOException", "Error Loading View", e.getMessage(), AlertType.ERROR);
 		}
 	}
-	
 
 }
